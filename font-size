@@ -281,8 +281,8 @@ sub font_change_size_xft
     my $size     = 0;
     my $new_size = 0;
     my %fonts    = (
-        "Termsyn" => {"min"=>8, "max"=>12},
-        "Terminus" => {"min"=>12, "max"=>32},
+        Termsyn => {min=>8, max=>12},
+        Terminus => {min=>12, max=>32},
     );
 
     foreach my $piece (@pieces) {
@@ -302,19 +302,20 @@ sub font_change_size_xft
 
     # Change the font
     if (exists $fonts{$resized[1]}) {  # Font name must follow '^xft:'
-        keys %fonts;
-        while (my ($font, $size_range) = each %fonts) {
-            if ($new_size >= %{$size_range}{"min"} and $new_size < %{$size_range}{"max"}) {
+        foreach my $font (keys %fonts) {
+            my $size_range = $fonts{$font};
+            if ($new_size >= $size_range->{min} and $new_size < $size_range->{max}) {
                 $resized[1] = $font;
                 last;
             }
         }
     }
 
-    my ($min_size, $max_size) = undef, undef;
-    foreach my $size_range (values %fonts) {
-        $min_size = %{$size_range}{"min"} if !defined $min_size or %{$size_range}{"min"} < $min_size;
-        $max_size = %{$size_range}{"max"} if !defined $max_size or %{$size_range}{"max"} > $max_size;
+    my ($min_size, $max_size) = (undef, undef);
+    foreach my $size_range_r (values %fonts) {
+        my $size_range = $size_range_r;
+        $min_size = $size_range->{min} if !defined $min_size or $size_range->{min} < $min_size;
+        $max_size = $size_range->{max} if !defined $max_size or $size_range->{max} > $max_size;
     }
 
     # Don't make fonts too small or too big
